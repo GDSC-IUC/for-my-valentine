@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pour ma valentine... ❤️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'romantic': ['"Dancing Script"', 'cursive'],
+                        'body': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'love-pink': '#ff8fa3',
+                        'love-red': '#ff4d6d',
+                        'highlight': '#f8f9fa',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                    },
+                    keyframes: {
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-20px)' } },
+                        shake: { '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' }, '20%, 80%': { transform: 'translate3d(2px, 0, 0)' }, '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' }, '40%, 60%': { transform: 'translate3d(4px, 0, 0)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #login-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, #e73c7e 0%, #ee7752 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #login-overlay.hidden-overlay {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: scale(1.1);
+        }
+
+        #main-content {
+            display: none; /* Caché par défaut pour éviter le flash de contenu */
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        #main-content.visible {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="font-body antialiased min-h-screen">
+
+    <div id="login-overlay">
+        <div class="glass-card p-8 md:p-10 rounded-3xl max-w-sm md:max-w-md w-full shadow-2xl text-center mx-4">
+            <h2 id="login-title" class="text-4xl md:text-5xl font-romantic text-white mb-4 drop-shadow-lg">Toc toc...</h2>
+            <p id="login-instruction" class="text-white/90 mb-6 text-base md:text-lg">C'est quoi le mot magique ?</p>
+            <input type="text" id="passwordInput" placeholder="Tape ici..."
+                class="w-full px-4 py-3 rounded-full border-2 border-white/30 bg-white/20 outline-none text-center text-white placeholder-white/60 font-bold text-lg focus:bg-white/30 transition-all mb-4"
+                autocomplete="off">
+            <button onclick="checkPassword()"
+                class="w-full bg-white hover:bg-highlight text-love-red font-bold py-3 rounded-full transition shadow-lg transform active:scale-95">
+                Valider ❤️
+            </button>
+            <p id="firstShotMsg" class="text-white font-bold mt-4 hidden text-lg md:text-xl animate-bounce">Bravo, tu as trouvé ! 😍</p>
+            <p id="errorMsg" class="text-white font-bold mt-4 hidden bg-red-500/20 py-2 rounded-lg">Ce n'est pas ça, essaye encore mon cœur... 😉</p>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div id="hearts-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+        <section class="min-h-screen flex flex-col justify-center items-center text-center px-6 relative z-10">
+            <div class="glass-card p-8 md:p-12 rounded-3xl animate-float max-w-2xl w-full">
+                <h1 class="text-5xl md:text-8xl font-romantic mb-4 text-white drop-shadow-lg">Hey Doudou !</h1>
+                <p class="text-xl md:text-3xl text-white/90 font-light mt-4">Joyeuse Saint Valentin ❤️</p>
+                <div class="mt-8 md:mt-12 animate-bounce text-3xl md:text-4xl text-white">👇</div>
+            </div>
+        </section>
+
+        <section class="max-w-4xl mx-auto px-6 py-10 relative z-10">
+            <div class="reveal flex flex-col md:flex-row items-center gap-6 md:gap-8 mb-24 md:mb-32">
+                <div class="w-full md:w-1/2">
+                    <div class="relative overflow-hidden rounded-2xl shadow-xl border-4 border-white/50">
+                        <img src="https://images.unsplash.com/photo-1490730141103-6cac27aaab94?q=80&w=600&auto=format&fit=crop"
+                            class="object-cover h-64 md:h-72 w-full" alt="Douceur">
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 glass-card p-6 md:p-8 rounded-2xl text-left">
+                    <h2 class="text-3xl md:text-4xl font-romantic mb-4 text-love-pink drop-shadow">Ce qui me fait craquer...</h2>
+                    <p class="text-white/90 text-base md:text-lg leading-relaxed font-light">
+                        C'est ta façon d'être, ton sourire et cette énergie qui rendent tout plus beau autour de toi. Tu
+                        n'as même pas besoin de faire d'efforts, c'est naturel.
+                    </p>
+                </div>
+            </div>
+
+            <div class="reveal flex flex-col md:flex-row-reverse items-center gap-6 md:gap-8 mb-24 md:mb-32">
+                <div class="w-full md:w-1/2">
+                    <div class="relative overflow-hidden rounded-2xl shadow-xl border-4 border-white/50">
+                        <img src="https://images.unsplash.com/photo-1507502707541-f369a3b18502?q=80&w=600&auto=format&fit=crop"
+                            class="object-cover h-64 md:h-72 w-full" alt="La route">
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 glass-card p-6 md:p-8 rounded-2xl text-left">
+                    <h2 class="text-3xl md:text-4xl font-romantic mb-4 text-love-pink drop-shadow">De Douala à Bangangté...</h2>
+                    <p class="text-white/90 text-base md:text-lg leading-relaxed font-light">
+                        La distance n'est qu'un chiffre. Même si je ne t'écris pas chaque minute, tu occupes toutes mes
+                        pensées. À chaque fosi que je programme un voyage pour te voir, je suis comme cet enfant à qui on a promis un cadeau et qui est impatient de le recevoir. Oui, tu es mon plus beau cadeau. 🎁
+                    </p>
+                </div>
+            </div>
+
+            <div class="reveal flex flex-col md:flex-row items-center gap-8 mb-32">
+
+                <div class="w-full md:w-1/2 group">
+
+                    <div class="relative overflow-hidden rounded-2xl shadow-xl border-4 border-white/50 transform group-hover:rotate-2 transition duration-500">
+
+                        <img src="https://images.unsplash.com/photo-1580071224303-4ac151718cb3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fG1vbWVudCUyMGRlJTIwdGVuZHJlc3NlfGVufDB8fDB8fHww" class="object-cover h-72 w-full hover:scale-110 transition duration-700" alt="Safe Place">
+
+                    </div>
+
+                </div>
+
+                <div class="w-full md:w-1/2 glass-card p-8 rounded-2xl text-left">
+
+                    <h2 class="text-4xl font-romantic mb-4 text-love-pink drop-shadow">Ma safe place</h2>
+
+                    <p class="text-white/90 text-lg leading-relaxed font-light">
+
+                        Parler avec toi, c'est comme rentrer à la maison. Tu es cet endroit où je peux être moi-même, sans filtre, juste bien. Peu importe les kilomètres, mon cœur, lui, ne bouge pas de là où tu es. Merci d'être cette présence dans ma vie.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="reveal glass-card p-8 md:p-12 rounded-3xl text-center border-t-4 border-love-pink/50 mb-24 md:mb-32">
+                <h2 class="text-3xl md:text-4xl font-romantic mb-6 text-love-pink drop-shadow">À cœur ouvert...</h2>
+                <p class="text-white/90 text-base md:text-lg leading-relaxed font-light mb-6">
+                    Tu sais, j'aurais aimé que cette journée s'accompagne de toutes les fleurs du monde,
+                    comme j'aime le faire d'habitude. Mais comme je te l'ai dit, ce mois est un peu particulier niveau
+                    budget avec les imprévus que j'ai eus.
+                </p>
+                <p class="text-white/90 text-base md:text-lg leading-relaxed font-light italic border-l-4 border-white/30 pl-4">
+                    "Ceci est mon petit bouquet de mots, ma façon de te dire que même sans artifice, ma priorité,
+                    c'est toi."
+                </p>
+            </div>
+        </section>
+
+        <section class="min-h-[60vh] flex flex-col justify-center items-center text-center px-6 relative z-10 pb-20">
+            <h2 class="text-3xl md:text-4xl font-romantic mb-10 reveal text-white drop-shadow-lg">Une dernière chose...</h2>
+            <div class="reveal relative z-20">
+                <button id="loveBtn"
+                    class="glass-card bg-white/20 hover:bg-white/40 text-white font-bold py-4 px-10 md:py-6 md:px-16 rounded-full border-2 border-white shadow-2xl hover:scale-105 transition-all duration-300 text-xl md:text-2xl backdrop-blur-xl">
+                    Clique ici mon cœur 🎁
+                </button>
+            </div>
+            <div id="hiddenMessage"
+                class="hidden mt-12 glass-card p-8 md:p-12 rounded-3xl max-w-sm md:max-w-lg transition-all duration-500 transform scale-95 opacity-0 z-20">
+                <p class="text-4xl md:text-5xl font-romantic text-love-pink mb-6 drop-shadow">Je t'aime Doudou !</p>
+                <p class="text-white/90 text-lg md:text-xl">Tu es mon <span class="font-bold text-love-pink">CSS</span> (Celui Sans Souci) et mon <span class="font-bold text-love-pink">HTML</span> (Heart That Makes Love).</p>
+                <p class="text-sm text-white/60 mt-6 italic">Bref, t'es la femme de ma life.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // PERSISTANCE DE LA SESSION (Login une seule fois par onglet ouvert)
+        window.onload = function() {
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                revealSite(true); // Sans délai si déjà connecté
+            }
+        };
+
+        let attempts = 0;
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value.trim().toLowerCase();
+            const errorMsg = document.getElementById('errorMsg');
+            const firstShotMsg = document.getElementById('firstShotMsg');
+            const instruction = document.getElementById('login-instruction');
+            const inputField = document.getElementById('passwordInput');
+
+            if (input === 'doudou') {
+                sessionStorage.setItem('isLoggedIn', 'true'); // On garde l'état pour les F5
+                launchConfetti();
+                firstShotMsg.classList.remove('hidden');
+                errorMsg.classList.add('hidden');
+                setTimeout(revealSite, 1500);
+            } else {
+                attempts++;
+                errorMsg.classList.remove('hidden');
+                inputField.classList.add('animate-shake');
+                if (attempts >= 2) {
+                    instruction.innerText = "Indice : Le petit nom par lequel j'aime t'appeler...";
+                    instruction.classList.add('text-yellow-200', 'font-bold');
+                }
+                setTimeout(() => { inputField.classList.remove('animate-shake'); }, 500);
+            }
+        }
+
+        function revealSite(fast = false) {
+            document.getElementById('login-overlay').classList.add('hidden-overlay');
+            const content = document.getElementById('main-content');
+            content.classList.add('visible');
+            setTimeout(reveal, fast ? 10 : 500);
+        }
+
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') checkPassword(); });
+
+        // ANIMATIONS AU SCROLL
+        function reveal() {
+            let reveals = document.querySelectorAll(".reveal");
+            reveals.forEach(el => {
+                let windowHeight = window.innerHeight;
+                let elementTop = el.getBoundingClientRect().top;
+                if (elementTop < windowHeight - 50) el.classList.add("active");
+            });
+        }
+        window.addEventListener("scroll", reveal);
+
+        // BOUTON FINAL
+        const btn = document.getElementById('loveBtn');
+        const msg = document.getElementById('hiddenMessage');
+        btn.addEventListener('click', () => {
+            msg.classList.remove('hidden');
+            setTimeout(() => { 
+                msg.classList.remove('scale-95', 'opacity-0'); 
+                msg.classList.add('scale-100', 'opacity-100'); 
+            }, 10);
+            btn.style.display = 'none';
+            launchConfettiEnd();
+        });
+
+        function launchConfetti() {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ffffff', '#ff4d6d', '#ff8fa3'] });
+        }
+
+        function launchConfettiEnd() {
+            var duration = 4 * 1000;
+            var end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff4d6d', '#ffffff'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff8fa3', '#ffffff'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        // COEURS FLOTTANTS EN ARRIÈRE PLAN
+        const container = document.getElementById('hearts-container');
+        const heartIcons = ['❤️', '💖', '🤍'];
+        for (let i = 0; i < 15; i++) {
+            const heart = document.createElement('div');
+            heart.innerText = heartIcons[Math.floor(Math.random() * 3)];
+            heart.className = "absolute pointer-events-none";
+            heart.style.fontSize = Math.random() * 15 + 15 + 'px';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = Math.random() * 100 + 'vh';
+            heart.style.opacity = Math.random() * 0.3 + 0.1;
+            heart.style.animation = `float ${Math.random() * 5 + 8}s infinite ease-in-out`;
+            container.appendChild(heart);
+        }
+    </script>
+</body>
+</html>
